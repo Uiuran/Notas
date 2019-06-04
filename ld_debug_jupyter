@@ -1,0 +1,2 @@
+#!/usr/bin/bash
+LD_DEBUG=libs jupyter notebook 2>&1 | grep "calling init" | sed 's|.*calling init: ||g' | xargs shasum | sort | uniq

@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+# search terms inside files recursively with grep, r for recursive, n for line number, l for listing files
+# TODO: how to add terms recursevily to the search and how to use include
+grep -rn 'matplotlib' ./ && grep -rnl 'Sparse' ./
