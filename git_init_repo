@@ -1,0 +1,6 @@
+git init
+git add *
+git add README.md 
+git commit -m 'terminal commands'
+git remote add origin https://github.com/Uiuran/Terminal-Dev-Utils.git
+git push -u origin master
