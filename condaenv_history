@@ -1,1 +1,0 @@
-cat ~/.conda/envs/stats27/conda-meta/history | grep '# cmd' | cut -d" " -f3-

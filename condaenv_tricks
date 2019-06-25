@@ -1,0 +1,10 @@
+# export env definition
+conda env export --name ENVNAME > envname.yml
+
+# create env from definition
+conda env create --file envname.yml
+# create env from cloned env
+conda create --clone ENVNAME --name NEWENV
+
+# display history of commands that created/updated the env
+cat ~/miniconda/envs/envname/conda-meta/history | grep '# cmd' | cut -d" " -f3-
