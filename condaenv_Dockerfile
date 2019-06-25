@@ -4,6 +4,7 @@
 # Remove container with name
 # sudo docker container rm containerdockerfoo
 # TODO: try do change software inside env-> build docker conda package and substitute in FROM with the new package.
+# from the link https://medium.com/@chadlagore/conda-environments-with-docker-82cdc9d25754
 
 
 FROM continuumio/miniconda2
