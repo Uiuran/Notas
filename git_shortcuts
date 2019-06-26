@@ -11,3 +11,6 @@ git log
 
 #list all branchs
 git branch --all
+
+#Change remote url after, perhaps, a rename of the repo
+git remote set-url origin https://github.com/Uiuran/newreponame.git
