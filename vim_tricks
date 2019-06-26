@@ -1,2 +1,4 @@
+# Lock ctrl+s, unlock terminal flow ctrl+q
+
 # save .swap with new name and do vim -d fileO savedswap
 
