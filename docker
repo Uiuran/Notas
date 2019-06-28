@@ -17,3 +17,11 @@ docker image ls
 docker container ls
 docker container ls --all
 docker container ls -aq
+
+## Atribute volume in your container to be shared with external fs without needing to develop without changing the image
+# -p : ports 
+# -v : volume
+# -d : run container as a service
+docker run hello-world -p 5000:5000 -v /pathto/volumeoutside/fs:/pathto/insidecontainer -d imagem
+
+
