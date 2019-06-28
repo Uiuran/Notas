@@ -24,4 +24,11 @@ docker container ls -aq
 # -d : run container as a service
 docker run hello-world -p 5000:5000 -v /pathto/volumeoutside/fs:/pathto/insidecontainer -d imagem
 
+## Search for Volume mount point in previous docker images and containers
+# docker images | grep Image ID
+# docker image inspect <Image-ID>
+# docker container inspect --name '<container-name>' or docker container inspect <container-ID>
+# 
+# It will display meta-data from image or container runned from image, search for Volume to know if there is file-system shared Volume mount point
 
+# TODO - How to set a Volume mount point in the Dockerfile that builds an Image
