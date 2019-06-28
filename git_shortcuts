@@ -14,3 +14,13 @@ git branch --all
 
 #Change remote url after, perhaps, a rename of the repo
 git remote set-url origin https://github.com/Uiuran/newreponame.git
+
+#Managing commits and pulls to different remote repos.
+#$git pull follows:
+#$git fetch repo.git
+# FETCH_HEAD gets reṕo.git hash head commit
+# $git merge : to merge local changes with your changes
+# If happens to be conflict use the following:
+# $git diff MERGE_HEAD(or whatever remote HEAD you wanna merge to local such ORIGIN_HEAD) FETCH_HEAD
+# git will show the difference conflicting and will pin it in the file, go to the file and solve the conflict
+# Do git commit adding the changes in the conflict, git merge and git pull. Then happily git push-ing ...
