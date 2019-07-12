@@ -1,0 +1,14 @@
+# install nbextensions
+# Extensions i use to develop in Jupyter:
+Snippets
+TableofContents2
+Codefolding
+Zenmode
+Hinterland
+Toggle all lines number
+Scratchpad
+CodeMirror
+Font Size
+
+# Dump command history
+%history -f FILENAME
