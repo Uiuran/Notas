@@ -6,5 +6,8 @@ conda env create --file envname.yml
 # create env from cloned env
 conda create --clone ENVNAME --name NEWENV
 
+# install version specific package, usefull to install not standard versions from conda repos
+conda install package=version
+
 # display history of commands that created/updated the env
 cat ~/miniconda/envs/envname/conda-meta/history | grep '# cmd' | cut -d" " -f3-
