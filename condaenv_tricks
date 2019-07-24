@@ -11,3 +11,6 @@ conda install package=version
 
 # display history of commands that created/updated the env
 cat ~/miniconda/envs/envname/conda-meta/history | grep '# cmd' | cut -d" " -f3-
+
+# pip
+conda pip install git+https://github.com/Technologicat/pyan/tree/v1.0.4
