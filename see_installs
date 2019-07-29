@@ -1,0 +1,5 @@
+# see what you have installed in your system
+TMPFILE="/tmp/seeinstalls.tmp"
+zgrep '^Package:' /var/log/installer/initial-status.gz | awk '{ print $2}' > $TMPFILE
+aptitude search -F %p '~i!~M' | awk '{ print $1}' | grep -v -F -f $TMPFILE
+rm $TMPFILE
