@@ -1,0 +1,11 @@
+tensorboard --logdir ~/logdir/ --port 6006 --debugger_port 6064
+
+from tensorflow.python import debug as tf_debug
+
+session = tf_debug.TensorBoardDebugWrapperSession(session,"grpc://localhost:6064")
+
+with tf.summary.FileWriter('/home/penalvad/stattus4/stattus4-audio-models/notebooks/',graph=buildgraph.graph,session=session) as writer:
+...
+acessar
+localhost:6006
+
