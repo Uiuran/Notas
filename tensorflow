@@ -1,4 +1,7 @@
-# Activate Tensorboard
+####
+## Activate Tensorboard
+####
+
 tensorboard --logdir ~/logdir/ --port 6006 --debugger_port 6064
 
 from tensorflow.python import debug as tf_debug
@@ -10,12 +13,15 @@ with tf.summary.FileWriter('/home/penalvad/stattus4/stattus4-audio-models/notebo
 acessar
 localhost:6006
 
-# CPP API for Operations DOCS:
+####
+## CPP API for Operations DOCS:
+####
 
 https://www.tensorflow.org/api_docs/cc/class/tensorflow/ops/resource-scatter-nd-add
 
-
-# Handy tensorflow functions to Comp Graph editing
+####
+## Handy tensorflow functions to Comp Graph editing
+####
 
 tf.graph_util.extract_sub_graph(
     graph_def,
@@ -26,7 +32,10 @@ dest_nodes: A list of strings specifying the destination node names.
 Returns:
 The GraphDef of the sub-graph.
 
+####
 ## Import Static Graph from GraphDef proto, i.e. graph without trainable variables
+####
+
 tf.graph_util.import_graph_def(
     graph_def,
     input_map=None,
@@ -44,7 +53,9 @@ producer_op_list: (Optional.) An OpList proto with the (possibly stripped) list 
 Returns:
 A list of Operation and/or Tensor objects from the imported graph, corresponding to the names in return_elements, and None if returns_elements is None.
 
-## Saver
+####
+## Saver, saver and restore variables in Meta Graph Def Proto files
+####
 
 See Variables for an overview of variables, saving and restoring.
 
@@ -211,7 +222,10 @@ save_debug_info: If True, save the GraphDebugInfo to a separate file, which in t
 Returns:
 A MetaGraphDef proto.
 
-### Import Meta Graph
+####
+## Import Meta Graph
+####
+
 tf.train.import_meta_graph(
     meta_graph_or_file,
     clear_devices=False,
