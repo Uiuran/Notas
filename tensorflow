@@ -10,6 +10,10 @@ with tf.summary.FileWriter('/home/penalvad/stattus4/stattus4-audio-models/notebo
 acessar
 localhost:6006
 
+# CPP API for Operations DOCS:
+
+https://www.tensorflow.org/api_docs/cc/class/tensorflow/ops/resource-scatter-nd-add
+
 
 # Handy tensorflow functions to Comp Graph editing
 
