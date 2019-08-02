@@ -54,6 +54,21 @@ Returns:
 A list of Operation and/or Tensor objects from the imported graph, corresponding to the names in return_elements, and None if returns_elements is None.
 
 ####
+## Add To Collections: add some collection such 'variables':[<tf.Variables ...>,<tf.Variables...>,....]
+####
+
+tf.add_to_collections(
+    names,
+    value
+)
+
+See tf.Graph.add_to_collections for more details.
+
+Args:
+names: The key for the collections. The GraphKeys class contains many standard names for collections.
+value: The value to add to the collections.
+
+####
 ## Saver, saver and restore variables in Meta Graph Def Proto files
 ####
 
