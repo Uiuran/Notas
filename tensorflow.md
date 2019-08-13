@@ -2,14 +2,29 @@
 ## Activate Tensorboard
 ####
 
-tensorboard --logdir ~/logdir/ --port 6006 --debugger_port 6064
+```python
+/some/path/mnist_experiments/
+/some/path/mnist_experiments/run1/
+/some/path/mnist_experiments/run1/events.out.tfevents.1456525581.name
+/some/path/mnist_experiments/run1/events.out.tfevents.1456525585.name
+/some/path/mnist_experiments/run2/
+/some/path/mnist_experiments/run2/events.out.tfevents.1456525385.name
+/tensorboard --logdir /some/path/mnist_experiments
+```
 
+```python
+tensorboard --logdir name1:/path/to/logs/1,name2:/path/to/logs/2 --port 6006 --debugger_port 6064
+``` 
+
+```python
 from tensorflow.python import debug as tf_debug
 
 session = tf_debug.TensorBoardDebugWrapperSession(session,"grpc://localhost:6064")
 
 with tf.summary.FileWriter('/home/penalvad/stattus4/stattus4-audio-models/notebooks/',graph=buildgraph.graph,session=session) as writer:
 ...
+```
+
 acessar
 localhost:6006
 
