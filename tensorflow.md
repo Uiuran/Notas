@@ -1,3 +1,5 @@
+# TensorFlow Cheatsheet
+
 ####
 ## Activate Tensorboard
 ####
@@ -15,6 +17,9 @@
 ```python
 tensorboard --logdir name1:/path/to/logs/1,name2:/path/to/logs/2 --port 6006 --debugger_port 6064
 ``` 
+
+- Insert [`tf.summary.scalar`](https://www.tensorflow.org/api_docs/python/tf/summary/scalar) nodes in the output nodes of the quantities you gonna supervise with tensorflow such
+
 
 ```python
 from tensorflow.python import debug as tf_debug
