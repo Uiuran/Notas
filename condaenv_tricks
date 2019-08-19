@@ -17,3 +17,8 @@ cat ~/miniconda/envs/envname/conda-meta/history | grep '# cmd' | cut -d" " -f3-
 
 # pip
 conda pip install git+https://github.com/Technologicat/pyan/tree/v1.0.4
+
+# or ...
+conda activate env 
+git clone https://url.some.package
+pip install ./some.package
