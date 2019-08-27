@@ -24,3 +24,7 @@ git remote set-url origin https://github.com/Uiuran/newreponame.git
 # $git diff MERGE_HEAD(or whatever remote HEAD you wanna merge to local such ORIGIN_HEAD) FETCH_HEAD
 # git will show the difference conflicting and will pin it in the file, go to the file and solve the conflict
 # Do git commit adding the changes in the conflict, git merge and git pull. Then happily git push-ing ...
+
+
+# revert wrong commit
+https://stackoverflow.com/questions/4114095/how-do-i-revert-a-git-repository-to-a-previous-commit#4114122
