@@ -36,3 +36,18 @@ git reset HEAD^
 git filter-branch --index-filter \
     'git rm --cached --ignore-unmatch path/to/mylarge_50mb_file' \
     --tag-name-filter cat -- --all
+    
+then do 
+
+git push --force
+   
+# Change specific commit with rebase
+
+git rebase -i
+
+in the default editor, modify pick to edit
+make changes in local repo
+
+git commit --all --amend --no-edit
+git rebase --continue
+git push --force
