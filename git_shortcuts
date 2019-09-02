@@ -31,3 +31,8 @@ https://stackoverflow.com/questions/4114095/how-do-i-revert-a-git-repository-to-
 
 # Reset
 git reset HEAD^
+
+# Delete file from previous commit index because you are being fucked by it's size and the repository does not accept it.
+git filter-branch --index-filter \
+    'git rm --cached --ignore-unmatch path/to/mylarge_50mb_file' \
+    --tag-name-filter cat -- --all
