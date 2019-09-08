@@ -1,6 +1,7 @@
-
+Uses -I for ignore specific pattern
 ```bash
-tree -I 'datasets|__pycache__|preprocessing|applications'
+tree -I '*.pyc'
+tree -I '.*.swp'
 ```
 
 ```bash
