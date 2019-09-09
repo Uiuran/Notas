@@ -1,6 +1,10 @@
-# Lock ctrl+s, unlock terminal flow ctrl+q
+# General Tips
 
-# save .swap with new name and do vim -d fileO savedswap
+Lock ctrl+s, unlock terminal flow ctrl+q
+
+save .swap with new name and do vim -d fileO savedswap
+
+Always do esc > :w  then esc > :q to save and exit
 
 # Plugin Installation
 
