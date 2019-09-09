@@ -6,6 +6,10 @@ save .swap with new name and do vim -d fileO savedswap
 
 Always do esc > :w  then esc > :q to save and exit
 
+## Navigate between different VIM windows 
+
+Your plugins will make use of window division like tmux does. The default comand to navigate between them is Ctrl+w.
+
 # Plugin Installation
 
 There are plenty of plugins in:
@@ -59,3 +63,24 @@ Launch vim and run :PluginInstall
 To install from command line: vim +PluginInstall +qall
 
 (optional) For those using the fish shell: add set shell=/bin/bash to your .vimrc
+
+# Navigate through your code functions, classes with taglist.vim
+
+You will need to install exuberant-ctags in your system:
+```bash
+sudo apt-get install exuberant-ctags
+```
+
+make sure the path you installed exuberant-ctags(just see the path to the binary in the verbose given in the command above, usually /usr/bin/) is in PATH environment variable ```bash printenv```
+
+then put the Plugin as shown above, between the call vundle functions
+```vim
+Plugin 'git://github.com/vim-scripts/taglist.vim.git'
+```
+
+Also, you can remap the activation of your tag windows like this:
+```vim
+nnoremap <silent><C-b> :TlistToggle<CR>
+``` 
+
+Where ```vim <C-b>``` is Ctrl+b
