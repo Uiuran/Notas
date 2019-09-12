@@ -6,6 +6,9 @@ conda env create --file envname.yml
 # create env from cloned env
 conda create --clone ENVNAME --name NEWENV
 
+# Create new env only with python
+conda create --name ENVNAME python=3.6
+
 #remove env
 conda remove --name kerashack --all
 
