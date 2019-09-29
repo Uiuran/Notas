@@ -10,6 +10,12 @@ Always do esc > :w  then esc > :q to save and exit
 
 Your plugins will make use of window division like tmux does. The default comand to navigate between them is Ctrl+w.
 
+# Find and Replace
+
+```vim 
+:%s/eth0/br0/g
+```
+
 # Plugin Installation
 
 There are plenty of plugins in:
