@@ -7,7 +7,9 @@ ffmpeg [input options] -i input_file_or_stream [output options] output_file_stre
 Ex:
 
 -ac: number of channels
+
 -ar: sampling_rate
+
 -acodec: audio codec, use ffmpeg -codecs to list all available
 
 Do ffmpeg -formats to see which formats are allowed to write the encoded packets of data. Use Audacity to verify transformation integrity.
@@ -15,26 +17,12 @@ Do ffmpeg -formats to see which formats are allowed to write the encoded packets
 
 # Full detailed transcoding process
 
- _______              ______________
-|       |            |              |
-| input |  demuxer   | encoded data |   decoder
-| file  | ---------> | packets      | -----+
-|_______|            |______________|      |
-                                           v
-                                       _________
-                                      |         |
-                                      | decoded |
-                                      | frames  |
-                                      |_________|
- ________             ______________       |
-|        |           |              |      |
-| output | <-------- | encoded data | <----+
-| file   |   muxer   | packets      |   encoder
-|________|           |______________|
-
+![transcoding](/transcoding.png)
 
 # References
 
 - Wav: https://en.wikipedia.org/wiki/WAV#Specification
+
 - ffmpeg: https://ffmpeg.org/ffmpeg.html#Audio-Options
+
 - Digital Sound Source: http://digitalsoundandmusic.com/curriculum/
