@@ -26,3 +26,5 @@ Do ffmpeg -formats to see which formats are allowed to write the encoded packets
 - ffmpeg: https://ffmpeg.org/ffmpeg.html#Audio-Options
 
 - Digital Sound Source: http://digitalsoundandmusic.com/curriculum/
+
+- Scaling filter (thanks glerm): https://trac.ffmpeg.org/wiki/Scaling
