@@ -1,6 +1,43 @@
 # TensorFlow Cheatsheet
 
 ####
+## Install with GPU
+####
+
+First, remember you can verify your installed packages, in Ubuntu, through ```bash dpkg -l ``` and will eventually have to add repos not from your gpu vendor to install all the toolchain, for example:
+```bash
+sudo add-apt-repository universe
+sudo apt-get update
+sudo apt-get install freeglut3
+```
+
+Main-Ref
+https://www.tensorflow.org/install/gpu
+
+See if your version of the driver is correct in relation to the listed in the reference above. My case Nvidia driver.
+```bash 
+nvidia-settings -v
+```
+
+Caveat on dependencies:
+If you get stuck in installation process follow the link
+https://devtalk.nvidia.com/default/topic/1043184/cuda-install-unmet-dependencies-cuda-depends-cuda-10-0-gt-10-0-130-but-it-is-not-going-to-be-installed/
+
+That is, you must track the unmet/uninstalled dependency by doing ```bash sudo apt-get install xxxx``` until you find it. In my case adding universe repo and installing freeglut3 package was not enough, i had to track, always try to install the intended package after sucessfully installing a dependency, until you got it all installed.
+
+Install Cuda, the last version through ```bash sudo apt-get install -y cuda```. Dont forget to install the cuDNN libs 
+
+```bash sudo apt-get install libcudnn7 \
+sudo apt-get install libcudnn7-dev
+```
+
+Finally
+
+```bash
+pip install tensorflow-gpu
+```
+
+####
 ## Activate Tensorboard
 ####
 
