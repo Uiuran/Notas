@@ -4,15 +4,11 @@
 ## Install with GPU
 ####
 
-First, remember you can verify your installed packages, in Ubuntu, through ```bash dpkg -l ``` and will eventually have to add repos not from your gpu vendor to install all the toolchain, for example:
-```bash
-sudo add-apt-repository universe
-sudo apt-get update
-sudo apt-get install freeglut3
-```
-
 Main-Ref
 https://www.tensorflow.org/install/gpu
+
+Important thing is your NVidia Driver be compatible version, that is a version greater than the CUDA driver, like in here i installed 440.39 for a CUDA 440.33.0 driver.
+Since NVidia drivers for linux are a pain in the ass (for example, they can lead to behaviours such unidentifying your notebook screen), beaware to know the CUDA Toolkits driver version, you can find it in CUDA Driver section at https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/index.html. 
 
 See if your version of the driver is correct in relation to the listed in the reference above. My case Nvidia driver.
 ```bash 
@@ -24,17 +20,47 @@ If you get stuck in installation process follow the link
 https://devtalk.nvidia.com/default/topic/1043184/cuda-install-unmet-dependencies-cuda-depends-cuda-10-0-gt-10-0-130-but-it-is-not-going-to-be-installed/
 
 That is, you must track the unmet/uninstalled dependency by doing ```bash sudo apt-get install xxxx``` until you find it. In my case adding universe repo and installing freeglut3 package was not enough, i had to track, always try to install the intended package after sucessfully installing a dependency, until you got it all installed.
-
-Install Cuda, the last version through ```bash sudo apt-get install -y cuda```. Dont forget to install the cuDNN libs 
-
-```bash sudo apt-get install libcudnn7 \
-sudo apt-get install libcudnn7-dev
+You will eventually have to add repos not from your gpu vendor to install all the toolchain, for example:
+```bash
+sudo add-apt-repository universe
+sudo apt-get update
+sudo apt-get install freeglut3
 ```
-
 Finally
 
 ```bash
 pip install tensorflow-gpu
+```
+
+### Test Tensorflow use of your GPU
+
+Execute the following python script 
+
+```python
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import tensorflow as tf
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+```
+You should see something like that (if you have only one GPU NVidia GTX 1050):
+
+```bash
+2019-11-29 01:34:58.001393: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcuda.so.1
+2019-11-29 01:34:58.101668: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:1006] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2019-11-29 01:34:58.102102: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1618] Found device 0 with properties: 
+name: GeForce GTX 1050 major: 6 minor: 1 memoryClockRate(GHz): 1.442
+pciBusID: 0000:01:00.0
+2019-11-29 01:34:58.102278: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudart.so.10.0
+2019-11-29 01:34:58.103293: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcublas.so.10.0
+2019-11-29 01:34:58.104170: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcufft.so.10.0
+2019-11-29 01:34:58.104373: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcurand.so.10.0
+2019-11-29 01:34:58.105444: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusolver.so.10.0
+2019-11-29 01:34:58.106288: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcusparse.so.10.0
+2019-11-29 01:34:58.218997: I tensorflow/stream_executor/platform/default/dso_loader.cc:44] Successfully opened dynamic library libcudnn.so.7
+2019-11-29 01:34:58.219293: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:1006] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2019-11-29 01:34:58.220520: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:1006] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2019-11-29 01:34:58.221532: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1746] Adding visible gpu devices: 0
+Num GPUs Available:  1
 ```
 
 ####
