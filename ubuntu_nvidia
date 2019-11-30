@@ -1,8 +1,0 @@
-on ubuntu 18.04 with nvidia graphic cards follow the page 
-
-https://www.mvps.net/docs/install-nvidia-drivers-ubuntu-18-04-lts-bionic-beaver-linux/
-
-install the 440. for latest gtx 10XX  graphics
-
-This enables to external display work properly.
-Still to see if gpu works with tensorflow installation.
