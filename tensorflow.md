@@ -621,3 +621,634 @@ Args:
 export_scope: Optional string. Name scope to remove.
 Returns:
 A SaverDef protocol buffer.
+
+####
+## TF Data (tf.data)
+####
+
+- A data source constructs a Dataset from data stored in memory or in one or more files.
+- A data transformation constructs a dataset from one or more tf.data.Dataset objects.
+
+### Basic mechanics
+
+To create an input pipeline, you must start with a data source. For example, to construct a Dataset from data in memory, you can use tf.data.Dataset.from_tensors() or tf.data.Dataset.from_tensor_slices(). Alternatively, if your input data is stored in a file in the recommended TFRecord format, you can use tf.data.TFRecordDataset().
+
+Once you have a Dataset object, you can transform it into a new Dataset by chaining method calls on the tf.data.Dataset object. For example, you can apply per-element transformations such as Dataset.map(), and multi-element transformations such as Dataset.batch(). See the documentation for tf.data.Dataset for a complete list of transformations.
+
+The Dataset object is a Python iterable.
+
+### Dataset structure
+A dataset contains elements that each have the same (nested) structure and the individual components of the structure can be of any type representable by tf.TypeSpec, including Tensor, SparseTensor, RaggedTensor, TensorArray, or Dataset.
+
+The Dataset.element_spec property allows you to inspect the type of each element component. The property returns a nested structure of tf.TypeSpec objects, matching the structure of the element, which may be a single component, a tuple of components, or a nested tuple of components. For example:
+
+dataset1 = tf.data.Dataset.from_tensor_slices(tf.random.uniform([4, 10]))
+
+dataset1.element_spec
+
+TensorSpec(shape=(10,), dtype=tf.float32, name=None)
+
+dataset2 = tf.data.Dataset.from_tensor_slices(
+   (tf.random.uniform([4]),
+    tf.random.uniform([4, 100], maxval=100, dtype=tf.int32)))
+
+dataset2.element_spec
+
+(TensorSpec(shape=(), dtype=tf.float32, name=None),
+ TensorSpec(shape=(100,), dtype=tf.int32, name=None))
+
+dataset3 = tf.data.Dataset.zip((dataset1, dataset2))
+
+dataset3.element_spec
+
+(TensorSpec(shape=(10,), dtype=tf.float32, name=None),
+ (TensorSpec(shape=(), dtype=tf.float32, name=None),
+  TensorSpec(shape=(100,), dtype=tf.int32, name=None)))
+
+### Dataset containing a sparse tensor.
+dataset4 = tf.data.Dataset.from_tensors(tf.SparseTensor(indices=[[0, 0], [1, 2]], values=[1, 2], dense_shape=[3, 4]))
+
+dataset4.element_spec
+
+SparseTensorSpec(TensorShape([3, 4]), tf.int32)
+
+### Use value_type to see the type of value represented by the element spec
+dataset4.element_spec.value_type
+
+tensorflow.python.framework.sparse_tensor.SparseTensor
+
+The Dataset transformations support datasets of any structure. When using the Dataset.map(), and Dataset.filter() transformations, which apply a function to each element, the element structure determines the arguments of the function:
+
+dataset1 = tf.data.Dataset.from_tensor_slices(
+    tf.random.uniform([4, 10], minval=1, maxval=10, dtype=tf.int32))
+
+dataset1
+
+<TensorSliceDataset shapes: (10,), types: tf.int32>
+
+for z in dataset1:
+  print(z.numpy())
+
+[9 1 7 2 7 2 5 8 8 8]
+[9 9 3 2 4 9 9 4 3 6]
+[3 9 2 9 3 1 8 7 2 8]
+[7 5 2 8 2 2 1 3 3 8]
+
+dataset2 = tf.data.Dataset.from_tensor_slices(
+   (tf.random.uniform([4]),
+    tf.random.uniform([4, 100], maxval=100, dtype=tf.int32)))
+
+dataset2
+
+<TensorSliceDataset shapes: ((), (100,)), types: (tf.float32, tf.int32)>
+
+dataset3 = tf.data.Dataset.zip((dataset1, dataset2))
+
+dataset3
+
+<ZipDataset shapes: ((10,), ((), (100,))), types: (tf.int32, (tf.float32, tf.int32))>
+
+for a, (b,c) in dataset3:
+  print('shapes: {a.shape}, {b.shape}, {c.shape}'.format(a=a, b=b, c=c))
+
+shapes: (10,), (), (100,)
+shapes: (10,), (), (100,)
+shapes: (10,), (), (100,)
+shapes: (10,), (), (100,)
+
+Reading input data
+Consuming NumPy arrays
+See Loading NumPy arrays for more examples.
+
+If all of your input data fits in memory, the simplest way to create a Dataset from them is to convert them to tf.Tensor objects and use Dataset.from_tensor_slices().
+
+train, test = tf.keras.datasets.fashion_mnist.load_data()
+
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/train-labels-idx1-ubyte.gz
+32768/29515 [=================================] - 0s 0us/step
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/train-images-idx3-ubyte.gz
+26427392/26421880 [==============================] - 0s 0us/step
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/t10k-labels-idx1-ubyte.gz
+8192/5148 [===============================================] - 0s 0us/step
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/t10k-images-idx3-ubyte.gz
+4423680/4422102 [==============================] - 0s 0us/step
+
+images, labels = train
+images = images/255
+
+dataset = tf.data.Dataset.from_tensor_slices((images, labels))
+dataset
+
+<TensorSliceDataset shapes: ((28, 28), ()), types: (tf.float64, tf.uint8)>
+
+### Consuming Python Generators
+
+The Dataset.from_generator constructor converts the python generator to a fully functional tf.data.Dataset.
+
+The constructor takes a callable as input, not an iterator. This allows it to restart the generator when it reaches the end. It takes an optional args argument, which is passed as the callable's arguments.
+
+The output_types argument is required because tf.data builds a tf.Graph internally, and graph edges require a tf.dtype.
+
+ds_counter = tf.data.Dataset.from_generator(count, args=[25], output_types=tf.int32, output_shapes = (), )
+
+for count_batch in ds_counter.repeat().batch(10).take(10):
+  print(count_batch.numpy())
+
+[0 1 2 3 4 5 6 7 8 9]
+[10 11 12 13 14 15 16 17 18 19]
+[20 21 22 23 24  0  1  2  3  4]
+[ 5  6  7  8  9 10 11 12 13 14]
+[15 16 17 18 19 20 21 22 23 24]
+[0 1 2 3 4 5 6 7 8 9]
+[10 11 12 13 14 15 16 17 18 19]
+[20 21 22 23 24  0  1  2  3  4]
+[ 5  6  7  8  9 10 11 12 13 14]
+[15 16 17 18 19 20 21 22 23 24]
+
+The output_shapes argument is not required but is highly recomended as many tensorflow operations do not support tensors with unknown rank. If the length of a particular axis is unknown or variable, set it as None in the output_shapes.
+
+It's also important to note that the output_shapes and output_types follow the same nesting rules as other dataset methods.
+
+Here is an example generator that demonstrates both aspects, it returns tuples of arrays, where the second array is a vector with unknown length.
+
+def gen_series():
+  i = 0
+  while True:
+    size = np.random.randint(0, 10)
+    yield i, np.random.normal(size=(size,))
+    i += 1
+
+for i, series in gen_series():
+  print(i, ":", str(series))
+  if i > 5:
+    break
+
+0 : []
+1 : [ 1.4608 -0.0935 -1.6648 -0.1007 -0.7357 -1.3826  1.5566 -1.1551]
+2 : [-1.5221  0.9483  0.0677 -0.2791  1.5543  0.1088]
+3 : [ 1.6014 -0.9247 -1.4246  2.0607 -1.1251 -2.2987 -0.9535]
+4 : [-0.3621  1.0529  0.017  -0.4316 -0.2567  1.0389  0.2873 -1.1755]
+5 : [ 0.9343 -0.4901 -0.2022  0.6525]
+6 : [ 0.2267 -0.291   0.5348 -0.7489 -1.5477 -0.4768 -1.6164 -0.21   -0.0965]
+
+The first output is an int32 the second is a float32.
+
+The first item is a scalar, shape (), and the second is a vector of unknown length, shape (None,)
+
+ds_series = tf.data.Dataset.from_generator(
+    gen_series, 
+    output_types=(tf.int32, tf.float32), 
+    output_shapes=((), (None,)))
+
+ds_series
+
+<DatasetV1Adapter shapes: ((), (None,)), types: (tf.int32, tf.float32)>
+
+Now it can be used like a regular tf.data.Dataset. Note that when batching a dataset with a variable shape, you need to use Dataset.padded_batch.
+
+ds_series_batch = ds_series.shuffle(20).padded_batch(10, padded_shapes=([], [None]))
+
+ids, sequence_batch = next(iter(ds_series_batch))
+print(ids.numpy())
+print()
+print(sequence_batch.numpy())
+
+[13 14 12 19 17  3  0  7  6 25]
+
+[[ 0.0699  2.4317  0.      0.      0.      0.      0.      0.    ]
+ [-1.0459 -0.5841  0.9426  0.7589  0.2838  0.3323 -2.3105  2.0333]
+ [-0.7891  0.4218 -1.0847 -1.2004 -0.0554  0.      0.      0.    ]
+ [ 0.4331  2.3756 -0.2903  1.0903 -0.0372  0.0772  0.      0.    ]
+ [-1.0121  0.6696  2.1943  1.7748  0.8892  0.9743  0.9654  0.    ]
+ [-1.7664  0.5746  0.      0.      0.      0.      0.      0.    ]
+ [-0.6153  0.      0.      0.      0.      0.      0.      0.    ]
+ [-0.2552  0.0501 -0.5079 -1.4735  0.4816 -0.7831  0.      0.    ]
+ [ 0.4108 -0.0345 -1.8443 -1.008   0.056   0.6    -0.6672  0.0302]
+ [ 0.      0.      0.      0.      0.      0.      0.      0.    ]]
+
+For a more realistic example, try wrapping preprocessing.image.ImageDataGenerator as a tf.data.Dataset.
+
+First download the data:
+
+flowers = tf.keras.utils.get_file(
+    'flower_photos',
+    'https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz',
+    untar=True)
+
+Downloading data from https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz
+228818944/228813984 [==============================] - 2s 0us/step
+
+Create the image.ImageDataGenerator
+
+img_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1./255, rotation_range=20)
+
+images, labels = next(img_gen.flow_from_directory(flowers))
+
+Found 3670 images belonging to 5 classes.
+
+print(images.dtype, images.shape)
+print(labels.dtype, labels.shape)
+
+float32 (32, 256, 256, 3)
+float32 (32, 5)
+
+ds = tf.data.Dataset.from_generator(
+    img_gen.flow_from_directory, args=[flowers], 
+    output_types=(tf.float32, tf.float32), 
+    output_shapes=([32,256,256,3], [32,5])
+)
+
+ds
+
+<DatasetV1Adapter shapes: ((32, 256, 256, 3), (32, 5)), types: (tf.float32, tf.float32)>
+
+Consuming TFRecord data
+See Loading TFRecords for an end-to-end example.
+
+The tf.data API supports a variety of file formats so that you can process large datasets that do not fit in memory. For example, the TFRecord file format is a simple record-oriented binary format that many TensorFlow applications use for training data. The tf.data.TFRecordDataset class enables you to stream over the contents of one or more TFRecord files as part of an input pipeline.
+
+Here is an example using the test file from the French Street Name Signs (FSNS).
+
+### Creates a dataset that reads all of the examples from two files.
+fsns_test_file = tf.keras.utils.get_file("fsns.tfrec", "https://storage.googleapis.com/download.tensorflow.org/data/fsns-20160927/testdata/fsns-00000-of-00001")
+
+Downloading data from https://storage.googleapis.com/download.tensorflow.org/data/fsns-20160927/testdata/fsns-00000-of-00001
+7905280/7904079 [==============================] - 1s 0us/step
+
+The filenames argument to the TFRecordDataset initializer can either be a string, a list of strings, or a tf.Tensor of strings. Therefore if you have two sets of files for training and validation purposes, you can create a factory method that produces the dataset, taking filenames as an input argument:
+
+dataset = tf.data.TFRecordDataset(filenames = [fsns_test_file])
+dataset
+
+<TFRecordDatasetV2 shapes: (), types: tf.string>
+
+Many TensorFlow projects use serialized tf.train.Example records in their TFRecord files. These need to be decoded before they can be inspected:
+
+raw_example = next(iter(dataset))
+parsed = tf.train.Example.FromString(raw_example.numpy())
+
+parsed.features.feature['image/text']
+
+bytes_list {
+  value: "Rue Perreyon"
+}
+
+Consuming text data
+See Loading Text for an end to end example.
+
+Many datasets are distributed as one or more text files. The tf.data.TextLineDataset provides an easy way to extract lines from one or more text files. Given one or more filenames, a TextLineDataset will produce one string-valued element per line of those files.
+
+directory_url = 'https://storage.googleapis.com/download.tensorflow.org/data/illiad/'
+file_names = ['cowper.txt', 'derby.txt', 'butler.txt']
+
+file_paths = [
+    tf.keras.utils.get_file(file_name, directory_url + file_name)
+    for file_name in file_names
+]
+
+Downloading data from https://storage.googleapis.com/download.tensorflow.org/data/illiad/cowper.txt
+819200/815980 [==============================] - 0s 0us/step
+Downloading data from https://storage.googleapis.com/download.tensorflow.org/data/illiad/derby.txt
+811008/809730 [==============================] - 0s 0us/step
+Downloading data from https://storage.googleapis.com/download.tensorflow.org/data/illiad/butler.txt
+811008/807992 [==============================] - 0s 0us/step
+
+dataset = tf.data.TextLineDataset(file_paths)
+
+Here are the first few lines of the first file:
+
+for line in dataset.take(5):
+  print(line.numpy())
+
+b"\xef\xbb\xbfAchilles sing, O Goddess! Peleus' son;"
+b'His wrath pernicious, who ten thousand woes'
+b"Caused to Achaia's host, sent many a soul"
+b'Illustrious into Ades premature,'
+b'And Heroes gave (so stood the will of Jove)'
+
+To alternate lines between files use Dataset.interleave. This makes it easier to shuffle files together. Here are the first, second and third lines from each translation:
+
+files_ds = tf.data.Dataset.from_tensor_slices(file_paths)
+lines_ds = files_ds.interleave(tf.data.TextLineDataset, cycle_length=3)
+
+for i, line in enumerate(lines_ds.take(9)):
+  if i % 3 == 0:
+    print()
+  print(line.numpy())
+
+
+b"\xef\xbb\xbfAchilles sing, O Goddess! Peleus' son;"
+b"\xef\xbb\xbfOf Peleus' son, Achilles, sing, O Muse,"
+b'\xef\xbb\xbfSing, O goddess, the anger of Achilles son of Peleus, that brought'
+
+b'His wrath pernicious, who ten thousand woes'
+b'The vengeance, deep and deadly; whence to Greece'
+b'countless ills upon the Achaeans. Many a brave soul did it send'
+
+b"Caused to Achaia's host, sent many a soul"
+b'Unnumbered ills arose; which many a soul'
+b'hurrying down to Hades, and many a hero did it yield a prey to dogs and'
+
+By default, a TextLineDataset yields every line of each file, which may not be desirable, for example, if the file starts with a header line, or contains comments. These lines can be removed using the Dataset.skip() or Dataset.filter() transformations. Here we skip the first line, then filter to find only survivors.
+
+titanic_file = tf.keras.utils.get_file("train.csv", "https://storage.googleapis.com/tf-datasets/titanic/train.csv")
+titanic_lines = tf.data.TextLineDataset(titanic_file)
+
+Downloading data from https://storage.googleapis.com/tf-datasets/titanic/train.csv
+32768/30874 [===============================] - 0s 0us/step
+
+for line in titanic_lines.take(10):
+  print(line.numpy())
+
+b'survived,sex,age,n_siblings_spouses,parch,fare,class,deck,embark_town,alone'
+b'0,male,22.0,1,0,7.25,Third,unknown,Southampton,n'
+b'1,female,38.0,1,0,71.2833,First,C,Cherbourg,n'
+b'1,female,26.0,0,0,7.925,Third,unknown,Southampton,y'
+b'1,female,35.0,1,0,53.1,First,C,Southampton,n'
+b'0,male,28.0,0,0,8.4583,Third,unknown,Queenstown,y'
+b'0,male,2.0,3,1,21.075,Third,unknown,Southampton,n'
+b'1,female,27.0,0,2,11.1333,Third,unknown,Southampton,n'
+b'1,female,14.0,1,0,30.0708,Second,unknown,Cherbourg,n'
+b'1,female,4.0,1,1,16.7,Third,G,Southampton,n'
+
+def survived(line):
+  return tf.not_equal(tf.strings.substr(line, 0, 1), "0")
+
+survivors = titanic_lines.skip(1).filter(survived)
+
+for line in survivors.take(10):
+  print(line.numpy())
+
+b'1,female,38.0,1,0,71.2833,First,C,Cherbourg,n'
+b'1,female,26.0,0,0,7.925,Third,unknown,Southampton,y'
+b'1,female,35.0,1,0,53.1,First,C,Southampton,n'
+b'1,female,27.0,0,2,11.1333,Third,unknown,Southampton,n'
+b'1,female,14.0,1,0,30.0708,Second,unknown,Cherbourg,n'
+b'1,female,4.0,1,1,16.7,Third,G,Southampton,n'
+b'1,male,28.0,0,0,13.0,Second,unknown,Southampton,y'
+b'1,female,28.0,0,0,7.225,Third,unknown,Cherbourg,y'
+b'1,male,28.0,0,0,35.5,First,A,Southampton,y'
+b'1,female,38.0,1,5,31.3875,Third,unknown,Southampton,n'
+
+Consuming CSV data
+See Loading CSV Files, and Loading Pandas DataFrames for more examples.
+
+The CSV file format is a popular format for storing tabular data in plain text.
+
+For example:
+
+titanic_file = tf.keras.utils.get_file("train.csv", "https://storage.googleapis.com/tf-datasets/titanic/train.csv")
+
+df = pd.read_csv(titanic_file, index_col=None)
+df.head()
+
+
+If your data fits in memory the same Dataset.from_tensor_slices method works on dictionaries, allowing this data to be easily imported:
+
+titanic_slices = tf.data.Dataset.from_tensor_slices(dict(df))
+
+for feature_batch in titanic_slices.take(1):
+  for key, value in feature_batch.items():
+    print("  {!r:20s}: {}".format(key, value))
+
+  'survived'          : 0
+  'sex'               : b'male'
+  'age'               : 22.0
+  'n_siblings_spouses': 1
+  'parch'             : 0
+  'fare'              : 7.25
+  'class'             : b'Third'
+  'deck'              : b'unknown'
+  'embark_town'       : b'Southampton'
+  'alone'             : b'n'
+
+A more scalable approach is to load from disk as necessary.
+
+The tf.data module provides methods to extract records from one or more CSV files that comply with RFC 4180.
+
+The experimental.make_csv_dataset function is the high level interface for reading sets of csv files. It supports column type inference and many other features, like batching and shuffling, to make usage simple.
+
+titanic_batches = tf.data.experimental.make_csv_dataset(
+    titanic_file, batch_size=4,
+    label_name="survived")
+
+WARNING:tensorflow:From /tmpfs/src/tf_docs_env/lib/python3.6/site-packages/tensorflow_core/python/data/experimental/ops/readers.py:521: parallel_interleave (from tensorflow.python.data.experimental.ops.interleave_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.data.Dataset.interleave(map_func, cycle_length, block_length, num_parallel_calls=tf.data.experimental.AUTOTUNE)` instead. If sloppy execution is desired, use `tf.data.Options.experimental_determinstic`.
+WARNING:tensorflow:From /tmpfs/src/tf_docs_env/lib/python3.6/site-packages/tensorflow_core/python/data/experimental/ops/readers.py:215: shuffle_and_repeat (from tensorflow.python.data.experimental.ops.shuffle_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use `tf.data.Dataset.shuffle(buffer_size, seed)` followed by `tf.data.Dataset.repeat(count)`. Static tf.data optimizations will take care of using the fused implementation.
+
+for feature_batch, label_batch in titanic_batches.take(1):
+  print("'survived': {}".format(label_batch))
+  print("features:")
+  for key, value in feature_batch.items():
+    print("  {!r:20s}: {}".format(key, value))
+
+'survived': [0 1 0 0]
+features:
+  'sex'               : [b'male' b'male' b'male' b'male']
+  'age'               : [28. 20. 28. 40.]
+  'n_siblings_spouses': [0 0 0 0]
+  'parch'             : [0 0 0 0]
+  'fare'              : [ 8.4583  7.2292  8.6625 27.7208]
+  'class'             : [b'Third' b'Third' b'Third' b'First']
+  'deck'              : [b'unknown' b'unknown' b'unknown' b'unknown']
+  'embark_town'       : [b'Queenstown' b'Cherbourg' b'Southampton' b'Cherbourg']
+  'alone'             : [b'y' b'y' b'y' b'y']
+
+You can use the select_columns argument if you only need a subset of columns.
+
+titanic_batches = tf.data.experimental.make_csv_dataset(
+    titanic_file, batch_size=4,
+    label_name="survived", select_columns=['class', 'fare', 'survived'])
+
+for feature_batch, label_batch in titanic_batches.take(1):
+  print("'survived': {}".format(label_batch))
+  for key, value in feature_batch.items():
+    print("  {!r:20s}: {}".format(key, value))
+
+'survived': [0 1 1 1]
+  'fare'              : [ 7.8542 23.25   14.5    20.575 ]
+  'class'             : [b'Third' b'Third' b'Second' b'Third']
+
+There is also a lower-level experimental.CsvDataset class which provides finer grained control. It does not support column type inference. Instead you must specify the type of each column.
+
+titanic_types  = [tf.int32, tf.string, tf.float32, tf.int32, tf.int32, tf.float32, tf.string, tf.string, tf.string, tf.string] 
+dataset = tf.data.experimental.CsvDataset(titanic_file, titanic_types , header=True)
+
+for line in dataset.take(10):
+  print([item.numpy() for item in line])
+
+[0, b'male', 22.0, 1, 0, 7.25, b'Third', b'unknown', b'Southampton', b'n']
+[1, b'female', 38.0, 1, 0, 71.2833, b'First', b'C', b'Cherbourg', b'n']
+[1, b'female', 26.0, 0, 0, 7.925, b'Third', b'unknown', b'Southampton', b'y']
+[1, b'female', 35.0, 1, 0, 53.1, b'First', b'C', b'Southampton', b'n']
+[0, b'male', 28.0, 0, 0, 8.4583, b'Third', b'unknown', b'Queenstown', b'y']
+[0, b'male', 2.0, 3, 1, 21.075, b'Third', b'unknown', b'Southampton', b'n']
+[1, b'female', 27.0, 0, 2, 11.1333, b'Third', b'unknown', b'Southampton', b'n']
+[1, b'female', 14.0, 1, 0, 30.0708, b'Second', b'unknown', b'Cherbourg', b'n']
+[1, b'female', 4.0, 1, 1, 16.7, b'Third', b'G', b'Southampton', b'n']
+[0, b'male', 20.0, 0, 0, 8.05, b'Third', b'unknown', b'Southampton', b'y']
+
+If some columns are empty, this low-level interface allows you to provide default values instead of column types.
+
+%%writefile missing.csv
+1,2,3,4
+,2,3,4
+1,,3,4
+1,2,,4
+1,2,3,
+,,,
+
+Writing missing.csv
+
+### Creates a dataset that reads all of the records from two CSV files, each with four float columns which may have missing values.
+
+record_defaults = [999,999,999,999]
+dataset = tf.data.experimental.CsvDataset("missing.csv", record_defaults)
+dataset = dataset.map(lambda *items: tf.stack(items))
+dataset
+
+<MapDataset shapes: (4,), types: tf.int32>
+
+for line in dataset:
+  print(line.numpy())
+
+[1 2 3 4]
+[999   2   3   4]
+[  1 999   3   4]
+[  1   2 999   4]
+[  1   2   3 999]
+[999 999 999 999]
+
+By default, a CsvDataset yields every column of every line of the file, which may not be desirable, for example if the file starts with a header line that should be ignored, or if some columns are not required in the input. These lines and fields can be removed with the header and select_cols arguments respectively.
+
+# Creates a dataset that reads all of the records from two CSV files with
+# headers, extracting float data from columns 2 and 4.
+record_defaults = [999, 999] # Only provide defaults for the selected columns
+dataset = tf.data.experimental.CsvDataset("missing.csv", record_defaults, select_cols=[1, 3])
+dataset = dataset.map(lambda *items: tf.stack(items))
+dataset
+
+<MapDataset shapes: (2,), types: tf.int32>
+
+for line in dataset:
+  print(line.numpy())
+
+[2 4]
+[2 4]
+[999   4]
+[2 4]
+[  2 999]
+[999 999]
+
+Consuming sets of files
+There are many datasets distributed as a set of files, where each file is an example.
+
+flowers_root = tf.keras.utils.get_file(
+    'flower_photos',
+    'https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz',
+    untar=True)
+flowers_root = pathlib.Path(flowers_root)
+
+Note: these images are licensed CC-BY, see LICENSE.txt for details.
+The root directory contains a directory for each class:
+
+for item in flowers_root.glob("*"):
+  print(item.name)
+
+daisy
+LICENSE.txt
+roses
+dandelion
+sunflowers
+tulips
+
+The files in each class directory are examples:
+
+list_ds = tf.data.Dataset.list_files(str(flowers_root/'*/*'))
+
+for f in list_ds.take(5):
+  print(f.numpy())
+
+b'/home/kbuilder/.keras/datasets/flower_photos/dandelion/14761980161_2d6dbaa4bb_m.jpg'
+b'/home/kbuilder/.keras/datasets/flower_photos/roses/6783408274_974796e92f.jpg'
+b'/home/kbuilder/.keras/datasets/flower_photos/dandelion/13897156242_dca5d93075_m.jpg'
+b'/home/kbuilder/.keras/datasets/flower_photos/daisy/17101762155_2577a28395.jpg'
+b'/home/kbuilder/.keras/datasets/flower_photos/sunflowers/9783416751_b2a03920f7_n.jpg'
+
+We can read the data using the tf.io.read_file function and extract the label from the path, returning (image, label) pairs:
+
+def process_path(file_path):
+  label = tf.strings.split(file_path, '/')[-2]
+  return tf.io.read_file(file_path), label
+
+labeled_ds = list_ds.map(process_path)
+
+for image_raw, label_text in labeled_ds.take(1):
+  print(repr(image_raw.numpy()[:100]))
+  print()
+  print(label_text.numpy())
+
+b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x01\x00H\x00H\x00\x00\xff\xfe\x00\x1ccmp3.10.3.1Lq3 0x1f7d625b\x00\xff\xdb\x00C\x00\x03\x02\x05\x03\x05\x02\x03\x03\x03\x03\x04\x07\x03\x04\x05\x08\x05\x05\t\t\x05\x0b\x07\x0f\x06\x08\r\x0b\r\r\x17\x0b\x0c\x0c\x0e\x1d%\x11\x0e\x0f#\x0f\x0c\x0c\x11'
+
+b'tulips'
+
+Batching dataset elements
+Simple batching
+The simplest form of batching stacks n consecutive elements of a dataset into a single element. The Dataset.batch() transformation does exactly this, with the same constraints as the tf.stack() operator, applied to each component of the elements: i.e. for each component i, all elements must have a tensor of the exact same shape.
+
+inc_dataset = tf.data.Dataset.range(100)
+dec_dataset = tf.data.Dataset.range(0, -100, -1)
+dataset = tf.data.Dataset.zip((inc_dataset, dec_dataset))
+batched_dataset = dataset.batch(4)
+
+for batch in batched_dataset.take(4):
+  print([arr.numpy() for arr in batch])
+
+[array([0, 1, 2, 3]), array([ 0, -1, -2, -3])]
+[array([4, 5, 6, 7]), array([-4, -5, -6, -7])]
+[array([ 8,  9, 10, 11]), array([ -8,  -9, -10, -11])]
+[array([12, 13, 14, 15]), array([-12, -13, -14, -15])]
+
+While tf.data tries to propagate shape information, the default settings of Dataset.batch result in an unknown batch size because the last batch may not be full. Note the Nones in the shape:
+
+batched_dataset
+
+<BatchDataset shapes: ((None,), (None,)), types: (tf.int64, tf.int64)>
+
+Use the drop_remainder argument to ignore that last batch, and get full shape propagation:
+
+batched_dataset = dataset.batch(7, drop_remainder=True)
+batched_dataset
+
+<BatchDataset shapes: ((7,), (7,)), types: (tf.int64, tf.int64)>
+
+Batching tensors with padding
+The above recipe works for tensors that all have the same size. However, many models (e.g. sequence models) work with input data that can have varying size (e.g. sequences of different lengths). To handle this case, the Dataset.padded_batch() transformation enables you to batch tensors of different shape by specifying one or more dimensions in which they may be padded.
+
+dataset = tf.data.Dataset.range(100)
+dataset = dataset.map(lambda x: tf.fill([tf.cast(x, tf.int32)], x))
+dataset = dataset.padded_batch(4, padded_shapes=(None,))
+
+for batch in dataset.take(2):
+  print(batch.numpy())
+  print()
+
+[[0 0 0]
+ [1 0 0]
+ [2 2 0]
+ [3 3 3]]
+
+[[4 4 4 4 0 0 0]
+ [5 5 5 5 5 0 0]
+ [6 6 6 6 6 6 0]
+ [7 7 7 7 7 7 7]]
+
+
+The Dataset.padded_batch() transformation allows you to set different padding for each dimension of each component, and it may be variable-length (signified by None in the example above) or constant-length. It is also possible to override the padding value, which defaults to 0.
+
+### Colab Notebook
+
+https://colab.research.google.com/drive/1Yo5kvh6OVV9KRTUEN9RFjCLX4EapWS-H
