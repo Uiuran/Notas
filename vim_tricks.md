@@ -160,3 +160,10 @@ syntax on
 filetype plugin indent on    " required
 
 ```
+# Select and edit by columns
+
+Ctrl + V to go into column mode.
+Select the columns and rows where you want to enter your text.
+Shift + i to go into insert mode in column mode.
+Type in the text you want to enter. Dont be discouraged by the fact that only the first row is changed.
+Esc to apply your change (or alternately Ctrl+c)
