@@ -25,3 +25,8 @@ conda pip install git+https://github.com/Technologicat/pyan/tree/v1.0.4
 conda activate env 
 git clone https://url.some.package
 pip install ./some.package
+
+# venv nativo
+
+python3 -m venv venv
+source venv/activate
