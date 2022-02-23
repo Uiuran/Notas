@@ -7,7 +7,7 @@ git remote add origin https://github.com/Uiuran/Terminal-Dev-Utils.git
 git push -u origin master
 
 # show all reviews of current branch
-git log
+git log --oneline
 
 #list all branchs
 git branch --all
