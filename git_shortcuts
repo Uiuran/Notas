@@ -29,8 +29,10 @@ git remote set-url origin https://github.com/Uiuran/newreponame.git
 # revert wrong commit
 https://stackoverflow.com/questions/4114095/how-do-i-revert-a-git-repository-to-a-previous-commit#4114122
 
-# Reset
+# Reset commits
 git reset HEAD^
+git reset --soft HEAD~2
+git reset --hard hashofthecommit
 
 # Delete file from previous commit index because you are being fucked by it's size and the repository does not accept it.
 git filter-branch --index-filter \
