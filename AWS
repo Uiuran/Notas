@@ -6,3 +6,9 @@ Ligar Acesso de IAM ao Billing e criar política de acesso ao billing.
 Criar Budget e alertas de consumo no billing.
 
  
+AWS Resumo
+
+AWS S3 - Buckets de armazenamento por objetos, armazenamento ilimitado
+
+Kinesis Data Firehose - Grava streams de dados para um output de um PUT ou de outro stream Kinesis, o destinatário pode ser um S3.
+Determina partições de gravação e de erro de gravação no S3 para facilitar posterior leitura.
