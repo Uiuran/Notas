@@ -88,6 +88,34 @@ nnoremap <silent><C-b> :TlistToggle<CR>
 
 Where ```vim <C-b>``` is Ctrl+b
 
+# YouCompleteMe
+
+Linux 64-bit
+
+The following assume you're using Ubuntu 20.04.
+
+Quick start, installing all completers
+
+- Install YCM plugin via Vundle
+- Install CMake, Vim and Python
+
+```bash
+apt install build-essential cmake vim-nox python3-dev
+```
+
+- Install mono-complete, go, node, java and npm
+
+```bash
+apt install mono-complete golang nodejs default-jdk npm
+``` 
+
+- Compile YCM
+
+```bash
+cd ~/.vim/bundle/YouCompleteMe
+python3 install.py --all
+```
+
 # Actual .vimrc
 
 ```vim 
@@ -151,7 +179,9 @@ Plugin 'vim-syntastic/syntastic'
 Plugin 'kien/ctrlp.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
-
+Plugin 'jpalardy/vim-slime'
+Plugin 'hanschen/vim-ipython-cell' 
+Plugin 'lambdalisue/vim-pyenv'
 call vundle#end()            " required
 
 let python_highlight_all=1
@@ -167,3 +197,8 @@ Select the columns and rows where you want to enter your text.
 Shift + i to go into insert mode in column mode.
 Type in the text you want to enter. Dont be discouraged by the fact that only the first row is changed.
 Esc to apply your change (or alternately Ctrl+c)
+
+# Using cells and ipython
+
+Running byobu or screen+tmux in your terminal, the vim will attemp to pass the cell code to the ipython console
+Use  # %%  to delimite the cell
