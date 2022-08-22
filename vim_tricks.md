@@ -179,8 +179,6 @@ Plugin 'vim-syntastic/syntastic'
 Plugin 'kien/ctrlp.vim'
 Plugin 'Valloric/YouCompleteMe'
 Plugin 'Lokaltog/powerline', {'rtp': 'powerline/bindings/vim/'}
-Plugin 'jpalardy/vim-slime'
-Plugin 'hanschen/vim-ipython-cell' 
 Plugin 'lambdalisue/vim-pyenv'
 call vundle#end()            " required
 
