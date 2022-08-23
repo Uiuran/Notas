@@ -1,3 +1,12 @@
+Docker Summary
+
+- Create Dockerfile by project
+
+There is the curated images hub https://hub.docker.com/ with many baseline docker images to use in your project.
+
+
+
+
 ##List Docker CLI commands
 docker
 docker container --help
