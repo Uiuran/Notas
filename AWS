@@ -5,6 +5,28 @@ Criar usuário com política adm, MFA e deletar chaves de acesso do usuario.
 Ligar Acesso de IAM ao Billing e criar política de acesso ao billing.
 Criar Budget e alertas de consumo no billing.
 
+Configure AWS profile for boto3 
+
+install aws cli 
+aws configure --profile profilename
+insert your credentials, the aws region, the output file for aws cli operations
+verify your .aws/ folder for the files
+config:
+[profilename]
+region = awsregion
+output = json 
+
+credentials:
+[profilename]
+aws_access_key_id = keyid
+aws_secret_access_key = secretaccesskey
+
+To use boto3 in python
+
+session = boto3.Session(profile_name=profilename)
+client = session.client("servicename", region_name="region")
+...
+
  
 AWS Resumo
 
