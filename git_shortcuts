@@ -30,6 +30,7 @@ git remote set-url origin https://github.com/Uiuran/newreponame.git
 https://stackoverflow.com/questions/4114095/how-do-i-revert-a-git-repository-to-a-previous-commit#4114122
 
 # Reset commits
+git log
 git reset HEAD^
 git reset --soft HEAD~2
 git reset --hard hashofthecommit
