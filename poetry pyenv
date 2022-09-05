@@ -1,0 +1,21 @@
+Pyenv
+
+pyenv versions
+-list all versions installed
+
+pyenv shell <version>
+-activate specific version for the shell
+
+pyenv activate <venvname>
+-activate specific virtual env
+
+Poetry
+
+poetry init 
+-for initializing a clean project
+poetry add
+-for adding dependencies
+poetry install
+- to install a project with poetry.lock file and pyproject.toml 
+poetry remove packagename
+- to remove package
