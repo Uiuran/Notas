@@ -27,6 +27,19 @@ session = boto3.Session(profile_name=profilename)
 client = session.client("servicename", region_name="region")
 ...
 
+Policy Validation
+
+https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-policy-validation.html
+
+in the aws cli:
+
+aws --profile profilename accessanalyzer validate-policy --policy-document file://name.json --policy-type value
+
+values:
+IDENTITY_POLICY
+RESOURCE_POLICY
+SERVICE_CONTROL_POLICY
+
  
 AWS Resumo
 
